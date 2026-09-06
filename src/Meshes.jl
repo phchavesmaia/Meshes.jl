@@ -113,6 +113,9 @@ include("integration.jl")
 # spatial indexes
 include("spatialindex.jl")
 
+# geodesics
+include("geodesics.jl")
+
 # operations
 include("centroid.jl")
 include("measures.jl")
@@ -138,9 +141,11 @@ include("coarsening.jl")
 # transforms
 include("transforms.jl")
 
+# distances
+include("distances.jl")
+
 # miscellaneous
 include("rand.jl")
-include("distances.jl")
 include("supportfun.jl")
 include("matrices.jl")
 include("projecting.jl")
@@ -475,6 +480,12 @@ export
   integral,
   localintegral,
 
+  # geodesics
+  geodesicfwd,
+  geodesicbwd,
+  geodesictangent,
+  geodesicazimuth,
+
   # centroids
   centroid,
 
@@ -626,6 +637,11 @@ export
   isaffine,
   isinvertible,
   inverse,
+
+  # distances
+  GeometricDistance,
+  EuclideanDistance,
+  GeodesicDistance,
 
   # miscellaneous
   laplacematrix,
