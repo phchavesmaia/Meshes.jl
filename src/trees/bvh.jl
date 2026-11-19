@@ -74,7 +74,7 @@ function BVHTree(boxes::AbstractVector{<:Box}; leafsize=8)
   BVHTree(boxes, perm, nodes, leafsize)
 end
 
-function foreachmatch(func, box::Box, tree::BVHTree, nodeind)
+function _foreachmatch(func, box::Box, tree::BVHTree, nodeind)
   node = tree.nodes[nodeind]
 
   # early exit if the current node's box does not intersect with the query box
@@ -90,14 +90,14 @@ function foreachmatch(func, box::Box, tree::BVHTree, nodeind)
       func(ind)
     end
   else
-    foreachmatch(func, box, tree, node.right)
-    foreachmatch(func, box, tree, node.left)
+    _foreachmatch(func, box, tree, node.right)
+    _foreachmatch(func, box, tree, node.left)
   end
 
   nothing
 end
 
-foreachmatch(func, box, tree) = foreachmatch(func, box, tree, 1)
+foreachmatch(func, box::Box, tree::BVHTree) = _foreachmatch(func, box, tree, 1)
 
 # -----------------
 # HELPER FUNCTIONS
