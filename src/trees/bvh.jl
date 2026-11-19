@@ -41,7 +41,7 @@ The positive integer `leafsize` specifies the maximum number of boxes per leaf.
 The input vector is stored without copying and must not be modified while
 the tree is in use.
 """
-struct BVHTree{B<:Box}
+struct BVHTree{B<:Box} <: SpatialTree
   boxes::Vector{B}
   perm::Vector{Int}
   nodes::Vector{BVHNode{B}}
@@ -74,15 +74,7 @@ function BVHTree(boxes::AbstractVector{<:Box}; leafsize=8)
   BVHTree(boxes, perm, nodes, leafsize)
 end
 
-"""
-    foreachcandidate(func, box, tree, nodeind=1)
-
-Apply `func` to each original element index whose cached box in `tree` intersects `box`.
-
-This function is allocation-free and is intended as the primitive interface for algorithms that 
-process candidates immediately, avoiding the need to materialize an intermediate vector of indices.
-"""
-function foreachcandidate(func, box::Box, tree::BVHTree, nodeind=1)
+function foreachmatch(func, box::Box, tree::BVHTree, nodeind)
   node = tree.nodes[nodeind]
 
   # early exit if the current node's box does not intersect with the query box
@@ -98,12 +90,14 @@ function foreachcandidate(func, box::Box, tree::BVHTree, nodeind=1)
       func(ind)
     end
   else
-    foreachcandidate(func, box, tree, node.right)
-    foreachcandidate(func, box, tree, node.left)
+    foreachmatch(func, box, tree, node.right)
+    foreachmatch(func, box, tree, node.left)
   end
 
   nothing
 end
+
+foreachmatch(func, box, tree) = foreachmatch(func, box, tree, 1)
 
 # -----------------
 # HELPER FUNCTIONS

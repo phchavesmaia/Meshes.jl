@@ -3,7 +3,7 @@
   boxes = [Box(cart(0, 0), cart(1, 1)), Box(cart(2, 2), cart(3, 3)), Box(cart(4, 4), cart(5, 5))]
   nboxes = length(boxes)
   for leafsize in (nboxes, nboxes + 1, 2nboxes)
-    ltree = Meshes.BVHTree(boxes; leafsize)
+    ltree = BVHTree(boxes; leafsize)
     lroot = ltree.nodes[1]
     @test length(ltree.nodes) == 1
     @test Meshes.isleaf(lroot)
@@ -14,24 +14,24 @@
 
   # construction and traversal retain original element indices
   boxes = reverse([Box(cart(i, 0), cart(i + 1, 1)) for i in 1:40])
-  @test_throws ArgumentError Meshes.BVHTree(boxes, leafsize=0)
-  @test_throws ArgumentError Meshes.BVHTree(boxes, leafsize=-1)
+  @test_throws ArgumentError BVHTree(boxes, leafsize=0)
+  @test_throws ArgumentError BVHTree(boxes, leafsize=-1)
   for leafsize in (1, 2, 8, 64)
-    ltree = @inferred Meshes.BVHTree(boxes; leafsize)
+    ltree = @inferred BVHTree(boxes; leafsize)
     for query in (Box(cart(5.5, 0), cart(12.5, 1)), boundingbox(boxes), Box(cart(100, 0), cart(101, 1)))
       candidates = Int[]
-      Meshes.foreachcandidate(i -> push!(candidates, i), query, ltree)
+      foreachmatch(i -> push!(candidates, i), query, ltree)
       @test sort(candidates) == findall(box -> intersects(box, query), boxes)
     end
   end
 
   # root bounding box
   boxes = reverse([Box(cart(i, 0), cart(i + 1, 1)) for i in 1:40])
-  tree = Meshes.BVHTree(boxes)
+  tree = BVHTree(boxes)
   @test tree.nodes[1].box ≈ boundingbox(boxes)
 
   # internal node invariants
-  tree = Meshes.BVHTree(boxes, leafsize=1)
+  tree = BVHTree(boxes, leafsize=1)
   for node in tree.nodes
     if !Meshes.isleaf(node)
       leftbox = tree.nodes[node.left].box
@@ -42,7 +42,7 @@
   end
 
   # leaf invariants
-  tree = Meshes.BVHTree(boxes, leafsize=2)
+  tree = BVHTree(boxes, leafsize=2)
   for node in tree.nodes
     if Meshes.isleaf(node)
       @test 1 ≤ abs(node.left) ≤ node.right ≤ length(tree.perm)

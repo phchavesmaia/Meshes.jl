@@ -463,6 +463,11 @@ export
   searchdists,
   maxneighbors,
 
+  # tree-based spatial indices
+  SpatialTree,
+  BVHTree,
+  foreachmatch,
+
   # predicates
   isparametrized,
   iscurve,
